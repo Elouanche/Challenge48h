@@ -6,7 +6,7 @@ export default function Dashboard({ auth, events }) {
     const [selectedEvent, setSelectedEvent] = useState(null);
 
 
-    // Méthode pour le modal
+    // Méthode pour ouvrir le modal
     const openModal = (event) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
@@ -131,6 +131,13 @@ export default function Dashboard({ auth, events }) {
                                     Heure : {selectedEvent.heure_debut} - {selectedEvent.heure_fin}
                                 </p>
                                 <p className="mb-4">Type : {selectedEvent.type_evenement}</p>
+                                <p className="mb-4">Contact : {selectedEvent.contact_nom} ({selectedEvent.contact_email}, {selectedEvent.contact_telephone})</p>
+                                <p className="mb-4">Covoiturage : {selectedEvent.coviturage_possible}</p>
+                                <p className="mb-4">Déjeuner prévu : {selectedEvent.dejeuner_prevu}</p>
+                                <p className="mb-4">Type de public : {selectedEvent.type_public}</p>
+                                {selectedEvent.information_supplementaire && (
+                                    <p className="mb-4">Informations supplémentaires : {selectedEvent.information_supplementaire}</p>
+                                )}
                                 <div className="flex justify-end space-x-2">
                                     <button
                                         className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -158,12 +165,19 @@ export default function Dashboard({ auth, events }) {
                                 <h2 className="text-xl font-semibold mb-4">
                                     Détails de l'événement
                                 </h2>
-                                <p className="mb-4">Titre : {selectedEvent.titre}</p>
+*<p className="mb-4">Titre : {selectedEvent.titre}</p>
                                 <p className="mb-4">Lieu : {selectedEvent.lieu}</p>
                                 <p className="mb-4">
                                     Heure : {selectedEvent.heure_debut} - {selectedEvent.heure_fin}
                                 </p>
                                 <p className="mb-4">Type : {selectedEvent.type_evenement}</p>
+                                <p className="mb-4">Contact : {selectedEvent.contact_nom} ({selectedEvent.contact_email}, {selectedEvent.contact_telephone})</p>
+                                <p className="mb-4">Covoiturage : {selectedEvent.coviturage_possible}</p>
+                                <p className="mb-4">Déjeuner prévu : {selectedEvent.dejeuner_prevu}</p>
+                                <p className="mb-4">Type de public : {selectedEvent.type_public}</p>
+                                {selectedEvent.information_supplementaire && (
+                                    <p className="mb-4">Informations supplémentaires : {selectedEvent.information_supplementaire}</p>
+                                )}
                                 <button
                                     className="bg-red-500 text-white px-4 py-2 rounded"
                                     onClick={closeModal}
@@ -178,3 +192,4 @@ export default function Dashboard({ auth, events }) {
         </MainLayout>
     );
 }
+
