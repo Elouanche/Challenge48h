@@ -9,7 +9,7 @@ export default function Dashboard({ auth, events }) {
                     <h2 className="text-2xl font-semibold text-gray-900">Événements à venir</h2>
                     
                 </div>
-
+                <div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {events.map((event) => (
                         <div key={event.id} className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
@@ -44,6 +44,7 @@ export default function Dashboard({ auth, events }) {
                             </div>
                         </div>
                     ))}
+                </div>
                 </div>
 
                 {events.length === 0 && (
