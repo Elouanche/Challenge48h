@@ -1,0 +1,11 @@
+networks:
+  network_web:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: custom_bridge_name
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.1.0/24
+          gateway: 192.168.1.1
+    external: false

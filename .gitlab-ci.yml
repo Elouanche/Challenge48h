@@ -1,0 +1,22 @@
+#stages:
+#  - test
+#  - deploy
+
+#test:
+#  stage: test
+#  script:
+#    - echo "Test de l'exécuteur Shell"
+#    - whoami
+#    - ls -l
+#  only:
+#    - main
+#
+#deploy:
+#  stage: deploy
+#  script:
+#    - echo "Déploiement en cours sur Docker_Serveur_Traefik..."
+#    - docker compose -f Docker_Serveur_Laravel/compose.yaml down
+#    - make for-linux-env
+#    - docker compose -f Docker_Serveur_Laravel/compose.yaml up -d --build
+#  only:
+#    - main

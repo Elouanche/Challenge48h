@@ -1,0 +1,21 @@
+# Nom de l'image Traefik
+TRAEFIK_IMAGE=traefik:v2.4
+
+# Nom du conteneur
+TRAEFIK_CONTAINER_NAME=traefik_proxy
+
+# Ports exposés
+HTTP_PORT=80
+HTTPS_PORT=443
+
+# Chemin vers le socket Docker
+DOCKER_SOCK_PATH=/var/run/docker.sock
+
+# Chemin vers le dossier de configuration de Traefik
+TRAEFIK_CONFIG_PATH=./config_traefik
+
+# Chemin vers le fichier acme.json pour le certificat SSL
+TRAEFIK_ACME_PATH=./config_traefik
+
+# Nom du réseau Docker
+NETWORK_NAME=network_web

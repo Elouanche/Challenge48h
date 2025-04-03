@@ -1,0 +1,33 @@
+[api]
+  dashboard = false
+  insecure = false
+
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+    [entryPoints.web.http]
+      [entryPoints.web.http.redirections]
+        [entryPoints.web.http.redirections.entryPoint]
+          to = "websecure"
+          scheme = "https"
+          permanent = true  # Redirection permanente vers HTTPS
+
+  [entryPoints.websecure]
+    address = ":443"
+    [entryPoints.websecure.http.tls]  # Définition correcte pour TLS
+      certResolver = "default"  # Certificat Let's Encrypt
+
+[providers]
+  [providers.docker]
+    watch = true
+    exposedByDefault = false
+    network = "network_web"  # Assurez-vous que "network_web" existe
+
+[certificatesResolvers]
+  [certificatesResolvers.default]
+    [certificatesResolvers.default.acme]
+      email = "jeremy.garcon@orange.fr"
+      storage = "acme.json"  # Fichier pour stocker les certificats
+      caServer = "https://acme-v02.api.letsencrypt.org/directory"  # Utilisation de Let's Encrypt v2
+
+    [certificatesResolvers.default.acme.tlsChallenge]  # Utilisation du challenge TLS pour obtenir le certificat
