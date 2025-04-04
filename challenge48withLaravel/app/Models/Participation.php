@@ -12,7 +12,7 @@ class Participation extends Model
     protected $table = 'participation'; // Indiquer la table si elle ne suit pas la convention
 
     protected $fillable = [
-        'id',
+        
         'user_id', 
         'event_id',
     ];

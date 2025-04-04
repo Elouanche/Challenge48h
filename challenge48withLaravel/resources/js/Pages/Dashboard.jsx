@@ -1,23 +1,52 @@
 import { useState } from 'react';
-import { useForm, Link } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react'; // Utilise useForm, pas useForms
 import MainLayout from '@/Layouts/MainLayout';
 
 export default function Dashboard({ auth, events }) {
-    const { post, processing } = useForm();
+    const { post, processing } = useForm();  // Utilise useForm pour gérer le formulaire
     const [loadingEventId, setLoadingEventId] = useState(null);
-
-    const handleParticipation = (eventId) => {
-        setLoadingEventId(eventId);
-
-        post('/participations', { event_id: eventId }, {
-            onSuccess: () => setLoadingEventId(null),
-            onError: () => setLoadingEventId(null),
-        });
-    };
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
-    // Méthode pour ouvrir le modal
+    const handleParticipation = (eventId) => {
+        const parsedEventId = parseInt(eventId, 10); // Conversion en entier
+    
+        if (isNaN(parsedEventId)) {
+            console.error("eventId n'est pas un nombre valide", eventId);
+            return;
+        }
+    
+        // Vérifie si l'utilisateur est bien authentifié et que son ID est défini
+        if (!auth || !auth.user || !auth.user.id) {
+            console.error("Utilisateur non authentifié ou ID manquant", auth);
+            alert("Vous devez être connecté pour participer à un événement.");
+            return;
+        }
+        const userId = auth.user.id;
+    
+        console.log("Données envoyées :", { user_id: userId, event_id: parsedEventId });
+    
+        setLoadingEventId(parsedEventId);
+    
+        post('/participations', 
+            { user_id: userId, event_id: parsedEventId }, 
+            {
+                headers: { 'Content-Type': 'application/json' }, 
+                onSuccess: () => {
+                    setLoadingEventId(null);
+                    window.location.href = '/participations/success';
+                },
+                onError: (errors) => {
+                    console.error("Erreur de validation Laravel :", errors);
+                    setLoadingEventId(null);
+                },
+            }
+        );
+    };
+    
+    
+    
+
     const openModal = (event) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
@@ -29,15 +58,22 @@ export default function Dashboard({ auth, events }) {
     };
 
     const handleDelete = () => {
-        console.log("Modifier l'événement :", selectedEvent);
-            // pas finis
-        closeModal();
+        if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
+            const { delete: destroy } = useForm();
+            destroy(route('events.destroy', selectedEvent.id), {
+                onSuccess: () => {
+                    closeModal();
+                    window.location.reload();
+                },
+                onError: (errors) => {
+                    console.error("Erreur lors de la suppression :", errors);
+                }
+            });
+        }
     };
 
     const handleUpdate = () => {
-        console.log("Modifier l'événement :", selectedEvent);
-            // pas finis
-        closeModal();
+        window.location.href = route('events.edit', selectedEvent.id);
     };
 
     return (
@@ -49,12 +85,11 @@ export default function Dashboard({ auth, events }) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {events.map((event) => (
-                            <div
-                                key={event.id}
-                                className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 cursor-pointer"
-                                onClick={() => openModal(event)}
-                            >
-                            <div className="p-6">
+                        <div
+                            key={event.id}
+                            className="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200 cursor-pointer"
+                        >
+                            <div className="p-6" onClick={() => openModal(event)}>
                                 <div className="flex justify-between items-start">
                                     <h3 className="text-xl font-semibold text-gray-900 mb-2">{event.titre}</h3>
                                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -63,7 +98,7 @@ export default function Dashboard({ auth, events }) {
                                 </div>
                                 <div className="mb-4">
                                     <div className="flex items-center text-gray-600 mb-2">
-                                        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" >  
+                                        <svg className="h-5 w-5 mr-2" fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24">
                                             <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                                             <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                                         </svg>
@@ -82,20 +117,16 @@ export default function Dashboard({ auth, events }) {
                                         {event.type_evenement}
                                     </div>
                                 </div>
-
-                                <button
-                                    onClick={() => handleParticipation(event.id)}
-                                    disabled={processing || loadingEventId === event.id}
-                                    className={`px-4 py-2 rounded-lg text-white font-semibold transition ${
-                                        loadingEventId === event.id 
-                                            ? 'bg-gray-400 cursor-not-allowed' 
-                                            : 'bg-[#1CABE2] hover:bg-[#000000]'
-                                    }`}
-                                >
-                                    {loadingEventId === event.id ? 'Participation en cours...' : 'Participer'}
-                                </button>
-
                             </div>
+
+                            <button
+                                onClick={() => handleParticipation(event.id)}
+                                disabled={processing || loadingEventId === event.id}
+                                className={`px-4 py-2 rounded-lg text-white font-semibold transition ${loadingEventId === event.id ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#1CABE2] hover:bg-[#006FA1]'}`}
+                            >
+                                {loadingEventId === event.id ? 'Participation en cours...' : 'Participer'}
+                            </button>
+                            <p>{event.id}</p>
                         </div>
                     ))}
                 </div>
@@ -107,125 +138,27 @@ export default function Dashboard({ auth, events }) {
                 )}
             </div>
 
-            {/* Modal */}
             {isModalOpen && selectedEvent && (
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-lg shadow-lg p-6 w-1/3">
-                        {auth?.user?.role === "admin" ? (
-                            // Modal pour les administrateurs
-                            <>
-                                <h2 className="text-xl font-semibold mb-4">
-                                    Modifier ou Supprimer l'événement
-                                </h2>
-                                <p className="mb-4">
-                                    Titre : {selectedEvent.titre}
-                                </p>
-                                <p className="mb-4">
-                                    Lieu : {selectedEvent.lieu}
-                                </p>
-                                <p className="mb-4">
-                                    Heure : {selectedEvent.heure_debut} -{" "}
-                                    {selectedEvent.heure_fin}
-                                </p>
-                                <p className="mb-4">
-                                    Type : {selectedEvent.type_evenement}
-                                </p>
-                                <p className="mb-4">
-                                    Contact : {selectedEvent.contact_nom} (
-                                    {selectedEvent.contact_email},{" "}
-                                    {selectedEvent.contact_telephone})
-                                </p>
-                                <p className="mb-4">
-                                    Covoiturage :{" "}
-                                    {selectedEvent.coviturage_possible}
-                                </p>
-                                <p className="mb-4">
-                                    Déjeuner prévu :{" "}
-                                    {selectedEvent.dejeuner_prevu}
-                                </p>
-                                <p className="mb-4">
-                                    Type de public : {selectedEvent.type_public}
-                                </p>
-                                {selectedEvent.information_supplementaire && (
-                                    <p className="mb-4">
-                                        Informations supplémentaires :{" "}
-                                        {
-                                            selectedEvent.information_supplementaire
-                                        }
-                                    </p>
-                                )}
-                                <div className="flex justify-end space-x-2">
-                                    <button
-                                        className="bg-blue-500 text-white px-4 py-2 rounded"
-                                        onClick={handleUpdate}
-                                    >
-                                        Modifier
-                                    </button>
-                                    <button
-                                        className="bg-red-500 text-white px-4 py-2 rounded"
-                                        onClick={handleDelete}
-                                    >
-                                        Supprimer
-                                    </button>
-                                    <button
-                                        className="bg-gray-500 text-white px-4 py-2 rounded"
-                                        onClick={closeModal}
-                                    >
-                                        Fermer
-                                    </button>
-                                </div>
-                            </>
-                        ) : (
-                            // Modal pour les utilisateurs
-                            <>
-                                <h2 className="text-xl font-semibold mb-4">
-                                    Détails de l'événement
-                                </h2>
-                                *
-                                <p className="mb-4">
-                                    Titre : {selectedEvent.titre}
-                                </p>
-                                <p className="mb-4">
-                                    Lieu : {selectedEvent.lieu}
-                                </p>
-                                <p className="mb-4">
-                                    Heure : {selectedEvent.heure_debut} -{" "}
-                                    {selectedEvent.heure_fin}
-                                </p>
-                                <p className="mb-4">
-                                    Type : {selectedEvent.type_evenement}
-                                </p>
-                                <p className="mb-4">
-                                    Contact : {selectedEvent.contact_nom} (
-                                    {selectedEvent.contact_email},{" "}
-                                    {selectedEvent.contact_telephone})
-                                </p>
-                                <p className="mb-4">
-                                    Covoiturage :{" "}
-                                    {selectedEvent.coviturage_possible}
-                                </p>
-                                <p className="mb-4">
-                                    Déjeuner prévu :{" "}
-                                    {selectedEvent.dejeuner_prevu}
-                                </p>
-                                <p className="mb-4">
-                                    Type de public : {selectedEvent.type_public}
-                                </p>
-                                {selectedEvent.information_supplementaire && (
-                                    <p className="mb-4">
-                                        Informations supplémentaires :{" "}
-                                        {
-                                            selectedEvent.information_supplementaire
-                                        }
-                                    </p>
-                                )}
-                                <button
-                                    className="bg-red-500 text-white px-4 py-2 rounded"
-                                    onClick={closeModal}
-                                >
-                                    Fermer
-                                </button>
-                            </>
+                        <h2 className="text-xl font-semibold mb-4">{selectedEvent.titre}</h2>
+                        <p className="mb-4">Lieu : {selectedEvent.lieu}</p>
+                        <p className="mb-4">Heure : {selectedEvent.heure_debut} - {selectedEvent.heure_fin}</p>
+                        <p className="mb-4">Type : {selectedEvent.type_evenement}</p>
+                        <p className="mb-4">Contact : {selectedEvent.contact_nom} ({selectedEvent.contact_email}, {selectedEvent.contact_telephone})</p>
+                        <p className="mb-4">Covoiturage : {selectedEvent.coviturage_possible}</p>
+                        <p className="mb-4">Déjeuner prévu : {selectedEvent.dejeuner_prevu}</p>
+                        <p className="mb-4">Type de public : {selectedEvent.type_public}</p>
+                        {selectedEvent.information_supplementaire && (
+                            <p className="mb-4">Informations supplémentaires : {selectedEvent.information_supplementaire}</p>
+                        )}
+
+                        {auth?.user?.role === "admin" && (
+                            <div className="flex justify-end space-x-2">
+                                <button className="bg-blue-500 text-white px-4 py-2 rounded" onClick={handleUpdate}>Modifier</button>
+                                <button className="bg-red-500 text-white px-4 py-2 rounded" onClick={handleDelete}>Supprimer</button>
+                                <button className="bg-gray-500 text-white px-4 py-2 rounded" onClick={closeModal}>Fermer</button>
+                            </div>
                         )}
                     </div>
                 </div>
