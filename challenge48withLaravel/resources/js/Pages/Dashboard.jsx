@@ -1,10 +1,11 @@
 import { useState } from "react";
 import MainLayout from "@/Layouts/MainLayout";
+import axios from "axios";
+
 
 export default function Dashboard({ auth, events }) {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
-
 
     // Méthode pour ouvrir le modal
     const openModal = (event) => {
@@ -18,9 +19,23 @@ export default function Dashboard({ auth, events }) {
     };
 
     const handleDelete = () => {
-        console.log("Supprimer l'événement :", selectedEvent);
-        // Ajoutez ici la logique pour supprimer l'événement via une requête API ou Inertia.js
-        closeModal();
+        if (selectedEvent) {
+            axios
+                .delete(`/events/${selectedEvent.id}`) // Assurez-vous que l'URL correspond à votre route Laravel
+                .then(() => {
+                    alert("Événement supprimé avec succès !");
+                    // Met à jour la liste des événements sans recharger la page
+                    const updatedEvents = events.filter(event => event.id !== selectedEvent.id);
+                    setSelectedEvent(null);
+                    setIsModalOpen(false);
+                    // Si vous utilisez un state pour les événements, mettez-le à jour ici
+                    setEvents(updatedEvents); // Décommentez si vous gérez les événements avec un state
+                })
+                .catch((error) => {
+                    console.error("Erreur lors de la suppression de l'événement :", error);
+                    alert("Une erreur s'est produite lors de la suppression de l'événement.");
+                });
+        }
     };
 
     const handleUpdate = () => {
@@ -52,7 +67,9 @@ export default function Dashboard({ auth, events }) {
                                             {event.titre}
                                         </h3>
                                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                            {new Date(event.date).toLocaleDateString("fr-FR")}
+                                            {new Date(
+                                                event.date
+                                            ).toLocaleDateString("fr-FR")}
                                         </span>
                                     </div>
                                     <div className="mb-4">
@@ -83,7 +100,8 @@ export default function Dashboard({ auth, events }) {
                                             >
                                                 <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                             </svg>
-                                            {event.heure_debut} - {event.heure_fin}
+                                            {event.heure_debut} -{" "}
+                                            {event.heure_fin}
                                         </div>
                                         <div className="flex items-center text-gray-600">
                                             <svg
@@ -125,18 +143,42 @@ export default function Dashboard({ auth, events }) {
                                 <h2 className="text-xl font-semibold mb-4">
                                     Modifier ou Supprimer l'événement
                                 </h2>
-                                <p className="mb-4">Titre : {selectedEvent.titre}</p>
-                                <p className="mb-4">Lieu : {selectedEvent.lieu}</p>
                                 <p className="mb-4">
-                                    Heure : {selectedEvent.heure_debut} - {selectedEvent.heure_fin}
+                                    Titre : {selectedEvent.titre}
                                 </p>
-                                <p className="mb-4">Type : {selectedEvent.type_evenement}</p>
-                                <p className="mb-4">Contact : {selectedEvent.contact_nom} ({selectedEvent.contact_email}, {selectedEvent.contact_telephone})</p>
-                                <p className="mb-4">Covoiturage : {selectedEvent.coviturage_possible}</p>
-                                <p className="mb-4">Déjeuner prévu : {selectedEvent.dejeuner_prevu}</p>
-                                <p className="mb-4">Type de public : {selectedEvent.type_public}</p>
+                                <p className="mb-4">
+                                    Lieu : {selectedEvent.lieu}
+                                </p>
+                                <p className="mb-4">
+                                    Heure : {selectedEvent.heure_debut} -{" "}
+                                    {selectedEvent.heure_fin}
+                                </p>
+                                <p className="mb-4">
+                                    Type : {selectedEvent.type_evenement}
+                                </p>
+                                <p className="mb-4">
+                                    Contact : {selectedEvent.contact_nom} (
+                                    {selectedEvent.contact_email},{" "}
+                                    {selectedEvent.contact_telephone})
+                                </p>
+                                <p className="mb-4">
+                                    Covoiturage :{" "}
+                                    {selectedEvent.coviturage_possible}
+                                </p>
+                                <p className="mb-4">
+                                    Déjeuner prévu :{" "}
+                                    {selectedEvent.dejeuner_prevu}
+                                </p>
+                                <p className="mb-4">
+                                    Type de public : {selectedEvent.type_public}
+                                </p>
                                 {selectedEvent.information_supplementaire && (
-                                    <p className="mb-4">Informations supplémentaires : {selectedEvent.information_supplementaire}</p>
+                                    <p className="mb-4">
+                                        Informations supplémentaires :{" "}
+                                        {
+                                            selectedEvent.information_supplementaire
+                                        }
+                                    </p>
                                 )}
                                 <div className="flex justify-end space-x-2">
                                     <button
@@ -165,18 +207,43 @@ export default function Dashboard({ auth, events }) {
                                 <h2 className="text-xl font-semibold mb-4">
                                     Détails de l'événement
                                 </h2>
-*<p className="mb-4">Titre : {selectedEvent.titre}</p>
-                                <p className="mb-4">Lieu : {selectedEvent.lieu}</p>
+                                *
                                 <p className="mb-4">
-                                    Heure : {selectedEvent.heure_debut} - {selectedEvent.heure_fin}
+                                    Titre : {selectedEvent.titre}
                                 </p>
-                                <p className="mb-4">Type : {selectedEvent.type_evenement}</p>
-                                <p className="mb-4">Contact : {selectedEvent.contact_nom} ({selectedEvent.contact_email}, {selectedEvent.contact_telephone})</p>
-                                <p className="mb-4">Covoiturage : {selectedEvent.coviturage_possible}</p>
-                                <p className="mb-4">Déjeuner prévu : {selectedEvent.dejeuner_prevu}</p>
-                                <p className="mb-4">Type de public : {selectedEvent.type_public}</p>
+                                <p className="mb-4">
+                                    Lieu : {selectedEvent.lieu}
+                                </p>
+                                <p className="mb-4">
+                                    Heure : {selectedEvent.heure_debut} -{" "}
+                                    {selectedEvent.heure_fin}
+                                </p>
+                                <p className="mb-4">
+                                    Type : {selectedEvent.type_evenement}
+                                </p>
+                                <p className="mb-4">
+                                    Contact : {selectedEvent.contact_nom} (
+                                    {selectedEvent.contact_email},{" "}
+                                    {selectedEvent.contact_telephone})
+                                </p>
+                                <p className="mb-4">
+                                    Covoiturage :{" "}
+                                    {selectedEvent.coviturage_possible}
+                                </p>
+                                <p className="mb-4">
+                                    Déjeuner prévu :{" "}
+                                    {selectedEvent.dejeuner_prevu}
+                                </p>
+                                <p className="mb-4">
+                                    Type de public : {selectedEvent.type_public}
+                                </p>
                                 {selectedEvent.information_supplementaire && (
-                                    <p className="mb-4">Informations supplémentaires : {selectedEvent.information_supplementaire}</p>
+                                    <p className="mb-4">
+                                        Informations supplémentaires :{" "}
+                                        {
+                                            selectedEvent.information_supplementaire
+                                        }
+                                    </p>
                                 )}
                                 <button
                                     className="bg-red-500 text-white px-4 py-2 rounded"
@@ -192,4 +259,3 @@ export default function Dashboard({ auth, events }) {
         </MainLayout>
     );
 }
-
