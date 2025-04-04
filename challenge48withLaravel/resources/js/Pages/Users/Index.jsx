@@ -1,4 +1,4 @@
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, Link, router } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 import { useState } from 'react';
 
@@ -9,7 +9,15 @@ export default function Index({ auth, users }) {
     const updateRole = (userId, newRole) => {
         put(`/users/${userId}/role`, {
             role: newRole
+        }, {
+            preserveScroll: true,
         });
+    };
+
+    const handleRowClick = (userId) => {
+        if (editingUser !== userId) {
+            router.visit(`/users/${userId}`);
+        }
     };
 
     return (
@@ -21,23 +29,19 @@ export default function Index({ auth, users }) {
                     <table className="min-w-full divide-y divide-gray-200">
                         <thead className="bg-gray-50">
                             <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Nom
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Email
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Rôle
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rôle</th>
+                                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {users.map((user) => (
-                                <tr key={user.id}>
+                                <tr
+                                    key={user.id}
+                                    onClick={() => handleRowClick(user.id)}
+                                    className={`cursor-pointer hover:bg-gray-100 transition ${editingUser === user.id ? 'cursor-default' : ''}`}
+                                >
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm font-medium text-gray-900">{user.name}</div>
                                     </td>
@@ -46,27 +50,26 @@ export default function Index({ auth, users }) {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            user.role === 'admin' 
+                                            user.role === 'admin'
                                                 ? 'bg-red-100 text-red-800'
-                                                : user.role === 'benevole'
-                                                ? 'bg-green-100 text-green-800'
-                                                : 'bg-gray-100 text-gray-800'
+                                                : 'bg-green-100 text-green-800'
                                         }`}>
-                                            {user.role}
+                                            {user.role === 'admin' ? 'Admin' : 'Bénévole'}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                                        onClick={(e) => e.stopPropagation()} // empêche la redirection quand on clique ici
+                                    >
                                         {editingUser === user.id ? (
                                             <div className="flex space-x-2">
                                                 <select
                                                     className="rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
-                                                    value={user.role}
-                                                    onChange={(e) => updateRole(user.id, e.target.value)}
+                                                    value={parseInt(user.role)}
+                                                    onChange={(e) => updateRole(user.id, parseInt(e.target.value))}
                                                     disabled={processing}
                                                 >
-                                                    <option value="user">Utilisateur</option>
-                                                    <option value="benevole">Bénévole</option>
-                                                    <option value="admin">Administrateur</option>
+                                                    <option value="0">Bénévole</option>
+                                                    <option value="1">Administrateur</option>
                                                 </select>
                                                 <button
                                                     type="button"
