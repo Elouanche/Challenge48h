@@ -5,12 +5,13 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
 
-export default function Register() {
+export default function Register({ email = '', invitation_token = null }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
-        email: '',
+        email: email || '',
         password: '',
         password_confirmation: '',
+        invitation_token: invitation_token,
     });
 
     const submit = (e) => {
@@ -54,10 +55,16 @@ export default function Register() {
                         className="mt-1 block w-full"
                         autoComplete="username"
                         onChange={(e) => setData('email', e.target.value)}
+                        readOnly={invitation_token !== null}
                         required
                     />
 
                     <InputError message={errors.email} className="mt-2" />
+                    {invitation_token && (
+                        <p className="mt-1 text-sm text-gray-600">
+                            Vous vous inscrivez avec une invitation. L'email ne peut pas être modifié.
+                        </p>
+                    )}
                 </div>
 
                 <div className="mt-4">

@@ -31,6 +31,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/users', function () { return Inertia::render('Users/Index'); })->name('users.index');
     });
 
+    Route::prefix('invitations')->group(function () {
+        Route::get('/', [\App\Http\Controllers\InvitationController::class, 'index'])->name('invitations.index');
+        Route::post('/', [\App\Http\Controllers\InvitationController::class, 'store'])->name('invitations.store');
+        Route::post('/{id}/resend', [\App\Http\Controllers\InvitationController::class, 'resend'])->name('invitations.resend');
+        Route::post('/{id}/delete', [\App\Http\Controllers\InvitationController::class, 'delete'])->name('invitations.delete');
+    });
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
