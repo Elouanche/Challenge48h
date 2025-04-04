@@ -1,17 +1,10 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import MainLayout from '@/Layouts/MainLayout';
 import UpdateEventForm from './Partials/UpdateEventForm';
 
-export default function Edit({ event }) {
+export default function Edit({ auth, event }) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Modifier l'événement
-                </h2>
-            }
-        >
-            <Head title="Modifier l'événement" />
+        <MainLayout auth={auth} title="Modifier un événement">
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
@@ -23,6 +16,6 @@ export default function Edit({ event }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </MainLayout>
     );
 }

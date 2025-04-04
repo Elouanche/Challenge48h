@@ -4,7 +4,7 @@ import MainLayout from '@/Layouts/MainLayout';
 
 export default function Index({ auth, events }) {
     return (
-        <MainLayout auth={auth} title="Événements">
+        <MainLayout  title="Événements">
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <h2 className="text-2xl font-semibold text-gray-900">Liste des Événements</h2>

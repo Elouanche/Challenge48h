@@ -20,25 +20,24 @@ export default function Header({ auth }) {
                         </div>
 
                         <div className="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                            <NavLink href="/" active={route().current('welcome')}>
-                                Accueil
-                            </NavLink>
                             {auth?.user && (
-                                <NavLink href="/dashboard" active={route().current('dashboard')}>
-                                    Événements
-                                </NavLink>
-                            )}
-                            {auth?.user?.role === 'admin' && (
                                 <>
-                                    <NavLink href="/users" active={route().current('users.index')}>
-                                        Utilisateurs
+                                    <NavLink href="/dashboard" active={route().current('dashboard')}>
+                                        Dashboard
                                     </NavLink>
-                                    <NavLink href="/events/create" active={route().current('events.create')}>
-                                        Créer un événement
-                                    </NavLink>
-                                    <NavLink href="/invitations" active={route().current('invitations.index')}>
-                                        Invitations
-                                    </NavLink>
+                                    {auth?.user?.role === 'admin' && (
+                                        <>
+                                            <NavLink href="/users" active={route().current('users.index')}>
+                                                Utilisateurs
+                                            </NavLink>
+                                            <NavLink href="/events/create" active={route().current('events.create')}>
+                                                Créer un événement
+                                            </NavLink>
+                                            <NavLink href="/invitations" active={route().current('invitations.index')}>
+                                                Invitations
+                                            </NavLink>
+                                        </>
+                                    )}
                                 </>
                             )}
                         </div>
@@ -119,14 +118,7 @@ export default function Header({ auth }) {
 
             <div className={(showingNavigationDropdown ? 'block' : 'hidden') + ' sm:hidden'}>
                 <div className="pt-2 pb-3 space-y-1">
-                    <ResponsiveNavLink href="/" active={route().current('welcome')}>
-                        Accueil
-                    </ResponsiveNavLink>
-                    {auth?.user && (
-                        <ResponsiveNavLink href="/dashboard" active={route().current('dashboard')}>
-                            Événements
-                        </ResponsiveNavLink>
-                    )}
+
                     {auth?.user?.role === 'admin' && (
                         <>
                             <ResponsiveNavLink href="/users" active={route().current('users.index')}>

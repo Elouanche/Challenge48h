@@ -72,7 +72,7 @@ class EventController extends Controller
 
         Event::create($validated);
 
-        return redirect()->route('events.index')->with('success', 'Événement créé avec succès.');
+        return redirect()->route('dashboard')->with('success', 'Événement créé avec succès.');
     }
     
     /**

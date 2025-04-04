@@ -1,17 +1,11 @@
 import { Head } from '@inertiajs/react';
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import MainLayout from '@/Layouts/MainLayout';
 import EventForm from './Partials/EventForm';
 
 export default function Create({ auth }) {
     return (
-        <AuthenticatedLayout
-            header={
-                <h2 className="text-xl font-semibold leading-tight text-gray-800">
-                    Créer un événement
-                </h2>
-            }
-        >
-            <Head title="Créer un événement" />
+        <MainLayout auth={auth} title="Créer un événement">
+           
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl space-y-6 sm:px-6 lg:px-8">
@@ -20,6 +14,6 @@ export default function Create({ auth }) {
                     </div>
                 </div>
             </div>
-        </AuthenticatedLayout>
+            </MainLayout>
     );
 }

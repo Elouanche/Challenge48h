@@ -18,6 +18,7 @@ class ParticipationController extends Controller
      */
     public function index()
     {
+        Log::info('Accès à la liste des participations');
         $user = Auth::user();
         $participations = Participation::with(['event'])
             ->where('user_id', $user->id)
@@ -36,6 +37,7 @@ class ParticipationController extends Controller
      */
     public function create(Event $event)
     {
+        Log::info('Affichage du formulaire de participation pour l\'événement', ['event_id' => $event->id]);
         return Inertia::render('Participations/Create', [
             'event' => $event
         ]);
@@ -49,24 +51,53 @@ class ParticipationController extends Controller
      */
     public function store(Request $request)
     {
+
+        Log::info('Tentative de création de participation', ['data' => $request->all()]);
+        
+        // Récupération directe de l'event_id depuis la requête
+        $event_id = $request->input('event_id');
+        
+        // Si event_id est null, essayer de le récupérer depuis le corps JSON
+        if (!$event_id && $request->isJson()) {
+            $jsonData = $request->json()->all();
+            $event_id = $jsonData['event_id'] ?? null;
+        }
+        
+        // Log pour déboguer
+        Log::info('Event ID récupéré', ['event_id' => $event_id]);
+        
+        // Validation des données
+        $validated = [
+            'event_id' => $event_id,
+            'user_id' => Auth::id()
+        ];
+        
+        // Vérification que l'event_id existe
+        if (!$event_id || !Event::find($event_id)) {
+            Log::error('Event ID invalide ou manquant', ['event_id' => $event_id]);
+            return back()->withErrors(['error' => 'Événement invalide ou manquant.']);
+        }
+        
+        // Log des données validées pour vérification
+        Log::info('Données validées pour participation', ['event_id' => $validated['event_id'], 'user_id' => $validated['user_id']]);
+        
+        Log::info('Données validées pour participation', $validated);
+
+
+        // Vérification si l'utilisateur participe déjà à l'événement
+        if (Participation::where('user_id', $validated['user_id'])
+            ->where('event_id', $validated['event_id'])
+            ->exists()) {
+            Log::warning('Participation déjà existante', $validated);
+            return back()->withErrors(['error' => 'Vous participez déjà à cet événement.']);
+        }
+        /*
         try {
-            // Validation des données
-            $validated = $request->validate([
-                'user_id' => 'required|integer|exists:users,id',
-                'event_id' => 'required|integer|exists:events,id'
-            ]);
-
-            // Vérification si l'utilisateur participe déjà à l'événement
-            $existingParticipation = Participation::where('user_id', $validated['user_id'])
-                ->where('event_id', $validated['event_id'])
-                ->exists();
-
-            if ($existingParticipation) {
-                return back()->withErrors(['message' => 'Vous participez déjà à cet événement.']);
-            }
-
-            // Création de la participation
             $participation = Participation::create($validated);
+
+            Log::info('Participation créée avec succès', ['participation_id' => $participation->id]);
+            return redirect()->route('participations.index')->with('success', 'Participation enregistrée avec succès.');
+
             
             // Récupération des détails complets de la participation
             $participation->load('event');
@@ -75,10 +106,8 @@ class ParticipationController extends Controller
                 'message' => 'Participation enregistrée avec succès.',
                 'participation' => $participation
             ]);
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de l\'enregistrement de la participation : ' . $e->getMessage());
-            return back()->withErrors(['error' => $e->getMessage()]);
-        }
+        }*/
+       
     }
 
     /**
@@ -89,21 +118,15 @@ class ParticipationController extends Controller
      */
     public function destroy(Participation $participation)
     {
-        try {
-            // Vérifier que l'utilisateur connecté est bien le propriétaire de la participation
-            if (Auth::id() !== $participation->user_id) {
-                return back()->withErrors(['error' => 'Vous n\'êtes pas autorisé à supprimer cette participation.']);
-            }
-            
-            $participation->delete();
-            
-            return Inertia::render('Participations/Success', [
-                'message' => 'Participation supprimée avec succès.'
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Erreur lors de la suppression de la participation : ' . $e->getMessage());
-            return back()->withErrors(['error' => 'Une erreur est survenue lors de la suppression.']);
+        if (Auth::id() !== $participation->user_id) {
+            return redirect()->route('events.show', $participation->event_id)
+                ->withErrors(['error' => 'Vous n\'êtes pas autorisé à supprimer cette participation.']);
         }
+
+        $participation->delete();
+
+        return redirect()->route('events.show', $participation->event_id)
+            ->with('success', 'Participation supprimée avec succès.');
     }
     
     /**
@@ -114,8 +137,10 @@ class ParticipationController extends Controller
      */
     public function showParticipants(Event $event)
     {
+        Log::info('Affichage des participants pour l\'événement', ['event_id' => $event->id]);
         // Vérifier que l'utilisateur est un administrateur
         if (Auth::user()->role !== 'admin') {
+            Log::warning('Tentative non autorisée d\'accès à la liste des participants', ['user_id' => Auth::id()]);
             return back()->withErrors(['error' => 'Vous n\'êtes pas autorisé à voir cette page.']);
         }
         
@@ -129,4 +154,3 @@ class ParticipationController extends Controller
         ]);
     }
 }
-

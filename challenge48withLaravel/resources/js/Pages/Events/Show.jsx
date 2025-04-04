@@ -1,10 +1,9 @@
-import { Head } from '@inertiajs/react';
 import { Link } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 
 export default function Show({ auth, event }) {
     return (
-        <MainLayout auth={auth} title={event.title}>
+        <MainLayout auth={auth} title="Détails de l'événement">
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
                     <Link

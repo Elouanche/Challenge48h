@@ -1,15 +1,15 @@
 import { useState } from 'react';
-import { useForm } from '@inertiajs/react'; // Utilise useForm, pas useForms
+import { useForm } from '@inertiajs/react';
 import MainLayout from '@/Layouts/MainLayout';
 
 export default function Dashboard({ auth, events }) {
-    const { post, processing } = useForm();  // Utilise useForm pour gérer le formulaire
+    const { post, processing } = useForm();  // Garder le hook au niveau du composant
     const [loadingEventId, setLoadingEventId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
 
     const handleParticipation = (eventId) => {
-        const parsedEventId = parseInt(eventId, 10); // Conversion en entier
+        const parsedEventId = parseInt(eventId, 10);
     
         if (isNaN(parsedEventId)) {
             console.error("eventId n'est pas un nombre valide", eventId);
@@ -22,31 +22,32 @@ export default function Dashboard({ auth, events }) {
             alert("Vous devez être connecté pour participer à un événement.");
             return;
         }
-        const userId = auth.user.id;
     
-        console.log("Données envoyées :", { user_id: userId, event_id: parsedEventId });
+        console.log("Données envoyées :", { event_id: parsedEventId });
     
         setLoadingEventId(parsedEventId);
-    
-        post('/participations', 
-            { user_id: userId, event_id: parsedEventId }, 
+        
+        // Utiliser directement la fonction post du hook useForm défini au niveau du composant
+        post(route('participations.store'), 
+            { 
+                event_id: parsedEventId,
+                user_id: auth.user.id
+            }, 
             {
-                headers: { 'Content-Type': 'application/json' }, 
                 onSuccess: () => {
                     setLoadingEventId(null);
-                    window.location.href = '/participations/success';
+                    window.location.href = route('participations.index');
                 },
                 onError: (errors) => {
                     console.error("Erreur de validation Laravel :", errors);
                     setLoadingEventId(null);
-                },
+                    alert(errors.error || "Une erreur est survenue lors de la participation.");
+                }
             }
         );
     };
-    
-    
-    
 
+    // Le reste du code reste inchangé...
     const openModal = (event) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
@@ -59,7 +60,7 @@ export default function Dashboard({ auth, events }) {
 
     const handleDelete = () => {
         if (confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')) {
-            const { delete: destroy } = useForm();
+            const { delete: destroy } = useForm(); // Attention: ceci devrait aussi être déplacé au niveau du composant
             destroy(route('events.destroy', selectedEvent.id), {
                 onSuccess: () => {
                     closeModal();
@@ -126,7 +127,6 @@ export default function Dashboard({ auth, events }) {
                             >
                                 {loadingEventId === event.id ? 'Participation en cours...' : 'Participer'}
                             </button>
-                            <p>{event.id}</p>
                         </div>
                     ))}
                 </div>

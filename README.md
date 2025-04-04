@@ -163,3 +163,4 @@ For launching Laravel in production mode, refer to the README file in the `Docke
 ---
 
 🎉 **Congratulations!** You have completed the setup 🚀.
+

@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('token')->unique();
             $table->boolean('used')->default(false);
-            $table->foreignId('created_by')->constrained('users');
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
