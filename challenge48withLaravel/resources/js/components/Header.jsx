@@ -36,6 +36,9 @@ export default function Header({ auth }) {
                                     <NavLink href="/events/create" active={route().current('events.create')}>
                                         Créer un événement
                                     </NavLink>
+                                    <NavLink href="/invitations" active={route().current('invitations.index')}>
+                                        Invitations
+                                    </NavLink>
                                 </>
                             )}
                         </div>
@@ -131,6 +134,9 @@ export default function Header({ auth }) {
                             </ResponsiveNavLink>
                             <ResponsiveNavLink href="/events/create" active={route().current('events.create')}>
                                 Créer un événement
+                            </ResponsiveNavLink>
+                            <ResponsiveNavLink href="/invitations" active={route().current('invitations.index')}>
+                                Invitations
                             </ResponsiveNavLink>
                         </>
                     )}
