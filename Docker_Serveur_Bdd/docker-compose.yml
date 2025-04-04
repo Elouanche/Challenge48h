@@ -58,7 +58,7 @@ services:
     image: phpmyadmin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.phpmyadmin.rule=Host(`mysql.jeremy-garcon.com`)"
+      - "traefik.http.routers.phpmyadmin.rule=Host(`DOMAINE_NAME_SERVEUR.com`)"
       - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
     container_name: "${COMPOSE_PROJECT_NAME}-phpmyadmin"
     restart: "always"
@@ -67,8 +67,8 @@ services:
     environment:
       PMA_HOST: database
       PMA_PORT: 3306
-      PMA_USER: jeremy
-      PMA_PASSWORD: 4S5ax6dh2003!
+      PMA_USER: user
+      PMA_PASSWORD: password
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}

@@ -1,116 +1,165 @@
-# 48h Project - Initialization Steps
+# 🚀 48h Project - Initialization Steps
 
-This project uses Laravel as the PHP framework along with Tailwind CSS for styling. Below are the steps to properly initialize and configure the project after cloning or retrieving the latest updates.
+This project uses **Laravel** as the PHP framework and **Tailwind CSS** for styling. Here are the steps to properly initialize and configure the project after cloning or pulling the latest updates.
 
-## Prerequisites
+---
+
+## ✅ Prerequisites
 
 Before starting, make sure you have the following tools installed:
 
-- **PHP** (version 8.x or higher)
-- **Composer** (PHP dependency manager)
-- **Node.js** and **NPM**
-- **MySQL** (or any other compatible database management system)
-
-## Initialization Steps
-
-### 1. Clone the Project
-
-If you haven't already, clone the project from the Git repository:
-
-```bash
-git clone https://gitlab.jeremy-garcon.com/d-veloppement/48h_challange.git
-cd .\challenge48withLaravel\ 
-```
-
-### 2. Install PHP Dependencies
-
-Install the PHP dependencies specified in the `composer.json` file:
-
-```bash
-composer install
-composer update
-```
-
-This will install all necessary dependencies for the Laravel application to function properly.
-
-### 3. Install JavaScript Dependencies
-
-Install front-end dependencies using NPM:
-
-```bash
-npm install
-```
-
-### 4. Configure the Environment
-
-The `.env` file contains the environment variables for the project, such as database credentials, API keys, etc.
-
-- If you don't have an `.env` file, copy the `.env.example` file:
-
-  ```bash
-  cp .env.example .env
-  ```
-
-- Open the `.env` file and configure the following settings:
-  
-  - **Database**: Set up database connection details (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
-
-### 5. Set Up the Database
-
-If the database is empty or there are migrations to apply, run the following commands:
-
-- **Migrations**: Apply migrations to create database tables:
-
-  ```bash
-  php artisan migrate
-  ```
-
-- If you also want to seed the database with sample data, execute:
-
-  ```bash
-  php artisan db:seed
-  ```
-
-- Additionally, generate an application key:
-
-  ```bash
-  php artisan key:generate
-  ```
-
-### 6. Start the Development Server
-
-You can start Laravel's built-in development server to check if everything is working correctly:
-
-```bash
-php artisan serve
-```
-
-This will start the server at [http://127.0.0.1:8000](http://127.0.0.1:8000).
+- 🐘 **[PHP](https://www.php.net/downloads)** (version 8.x or higher): Required to run Laravel.
+- 🎼 **[Composer](https://getcomposer.org/download/)**: PHP dependency manager.
+- 🟢 **[Node.js](https://nodejs.org/)** and **[NPM](https://www.npmjs.com/)**: Required to compile CSS/JS files.
+- 🗄️ **[MySQL](https://dev.mysql.com/downloads/)**: Database used by the application.
+- 🐳 **[Docker](https://www.docker.com/)**: To containerize the application and its dependencies.
 
 ---
 
-## Useful Commands
+## 🛠️ Initialization Steps
 
-- **Run Migrations**: `php artisan migrate`
-- **Run Migrations**: `php artisan migrate:refresh`
-- **Run Seeds**: `php artisan db:seed`
-- **Clear Cache**: `php artisan cache:clear`
-- **Start Local Server**: `php artisan serve`
-- **Generate Application Key**: `php artisan key:generate`
+### 1️⃣ Configure the Laravel Environment
 
-## Dependencies
+1. Copy the `.env.example` file if the `.env` file does not exist:
 
-This project utilizes the following dependencies:
+    ```bash
+    cp challenge48withLaravel/.env.example challenge48withLaravel/.env
+    ```
 
-- **Laravel**: PHP framework
-- **Composer**: PHP dependency manager
-- **NPM**: JavaScript dependency manager
-- **Tailwind CSS**: Utility-first CSS framework
+2. 📝 Edit the `.env` file to configure the following settings:
+    - **Database**: (`DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`).
+
+> **Why?** These variables allow Laravel to connect to the database and other services.
 
 ---
 
-If you encounter any issues, ensure that all required services (database, cache server, etc.) are running and that the `.env` file is correctly configured.
+### 2️⃣ Configure the MySQL Database in Docker
+
+1. Copy the sample environment file for Docker:
+
+    ```bash
+    cp Docker_Serveur_Bdd/sample.env Docker_Serveur_Bdd/.env
+    ```
+
+2. Configure your DNS or connection port:
+
+    - **With DNS**:
+
+      ```yaml
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.phpmyadmin.rule=Host(`DOMAIN_NAME_SERVER.com`)"
+        - "traefik.http.routers.phpmyadmin.entrypoints=websecure"
+      ```
+
+    - **Without DNS**:
+
+      ```yaml
+      ports:
+        - "8085:80"
+        - "${HOST_MACHINE_PMA_PORT}:80"
+        - "${HOST_MACHINE_PMA_SECURE_PORT}:443"
+      ```
+
+3. 🛡️ Set the environment variables in the `.env` file:
+
+    ```env
+    MYSQL_USER=user
+    MYSQL_PASSWORD=password
+    MYSQL_DATABASE=database
+    ```
+
+> **Note:** Avoid including sensitive information directly in the project's `.env` file.
 
 ---
 
-Good luck and happy coding!
+### 3️⃣ Start Docker Traefik
+
+1. Copy the sample environment file for Traefik:
+
+    ```bash
+    cp Docker_Serveur_Traefik/sample_env Docker_Serveur_Traefik/.env
+    ```
+
+2. 🚢 Start Traefik with Docker Compose:
+
+    ```bash
+    docker-compose -f Docker_Serveur_Traefik/docker-compose.yml up -d
+    ```
+
+> **Why?** This starts Traefik to handle HTTP/HTTPS requests.
+
+---
+
+### 4️⃣ Start the Database with Docker
+
+1. 🗄️ Start the database with Docker Compose:
+
+    ```bash
+    docker-compose -f Docker_Serveur_Bdd/docker-compose.yml up -d
+    ```
+
+2. 🌐 Access the interface via: [http://localhost:8085](http://localhost:8085)
+
+> **Explanation:** This command starts the MySQL container (and phpMyAdmin if configured).
+
+---
+
+### 5️⃣ Start the Laravel Project in Development Mode
+
+1. If the `.env` file does not exist, copy it:
+
+    ```bash
+    cp .env.example .env
+    ```
+
+2. Install PHP and Node.js dependencies:
+
+    ```bash
+    composer install && composer update && npm install
+    ```
+
+3. Open two terminals:
+    - **Terminal 1**: Start the Node.js development server:
+
+      ```bash
+      npm run dev
+      ```
+
+    - **Terminal 2**: Start the Laravel server:
+
+      ```bash
+      php artisan serve
+      ```
+
+---
+
+### 6️⃣ Configure the Database with Migration
+
+1. Apply migrations to create the tables:
+
+    ```bash
+    php artisan migrate
+    ```
+
+2. (Optional) Seed the database with sample data:
+
+    ```bash
+    php artisan db:seed
+    ```
+
+3. Generate an application key:
+
+    ```bash
+    php artisan key:generate
+    ```
+
+---
+
+### 7️⃣ Start Laravel in Production Mode
+
+For launching Laravel in production mode, refer to the README file in the `Docker_Serveur_Laravel` directory.
+
+---
+
+🎉 **Congratulations!** You have completed the setup 🚀.
